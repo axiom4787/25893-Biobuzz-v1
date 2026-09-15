@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Utility(name = "Test: intake", description = "Test running the intake")
+@TeleOp(name = "Test: intake")
 public class TestIntake extends LinearOpMode {
     @Override
     public void runOpMode() {
