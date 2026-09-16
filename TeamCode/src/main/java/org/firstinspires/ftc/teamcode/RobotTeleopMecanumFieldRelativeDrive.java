@@ -60,6 +60,8 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
 
+    DcMotor intake;
+
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
@@ -85,13 +87,16 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         RevHubOrientationOnRobot orientationOnRobot = new
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+
+
+        intake = hardwareMap.get(DcMotor.class, "intake");
     }
 
     @Override
@@ -112,6 +117,12 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
             drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         } else {
             driveFieldRelative(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        }
+
+        if (gamepad1.left_trigger_pressed) {
+            intake.setPower(1);
+        } else {
+            intake.setPower(0);
         }
     }
 
