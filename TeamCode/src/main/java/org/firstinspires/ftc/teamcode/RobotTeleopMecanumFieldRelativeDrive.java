@@ -32,7 +32,9 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -61,6 +63,8 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
     DcMotor backRightDrive;
 
     DcMotor intake;
+
+    CRServo left, right;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -97,6 +101,10 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
 
 
         intake = hardwareMap.get(DcMotor.class, "intake");
+
+        left = hardwareMap.get(CRServo.class, "il");
+        right = hardwareMap.get(CRServo.class, "ir");
+        left.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -121,8 +129,16 @@ public class RobotTeleopMecanumFieldRelativeDrive extends OpMode {
 
         if (gamepad1.left_trigger_pressed) {
             intake.setPower(1);
+            left.setPower(1);
+            right.setPower(1);
+        } else if (gamepad1.right_trigger_pressed) {
+            intake.setPower(-1);
+            left.setPower(-1);
+            right.setPower(-1);
         } else {
             intake.setPower(0);
+            left.setPower(0);
+            right.setPower(0);
         }
     }
 
