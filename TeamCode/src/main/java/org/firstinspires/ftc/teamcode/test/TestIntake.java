@@ -30,7 +30,7 @@ public class TestIntake extends LinearOpMode {
     private boolean should_intake() {
         HuskyLens.Block[] blocks = huskyLens.blocks();
         for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i].id == 0) {
+            if (blocks[i].id == 1) {
                 return false;
             }
         }
