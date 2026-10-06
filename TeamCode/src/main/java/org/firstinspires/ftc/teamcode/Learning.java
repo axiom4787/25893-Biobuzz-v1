@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.service.autofill.RegexValidator;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,7 +16,9 @@ public class Learning extends LinearOpMode {
     public void runOpMode() {
         //bunch of random hardware mapping stuff
         DcMotor shooter = hardwareMap.get(DcMotor.class, "shooter");
-        DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
+        DcMotor middleIntake = hardwareMap.get(DcMotor.class, "middleIntake");
+        CRServo leftIntake = hardwareMap.get(CRServo.class, "leftIntake");
+        CRServo rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
         CRServo transfer = hardwareMap.get(CRServo.class, "transfer");
 
         DcMotor frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -36,12 +36,16 @@ public class Learning extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()){
 
-            //for intake
+            //for intake  (recalibrate to work right (if work wrong))
             if(gamepad1.left_trigger_pressed){
-                intake.setPower(1);
+                middleIntake.setPower(1);
+                leftIntake.setPower(-1);
+                rightIntake.setPower(1);
             }
             else{
-                intake.setPower(0);
+                middleIntake.setPower(0);
+                leftIntake.setPower(0);
+                rightIntake.setPower(0);
             }
 
             //for shooter
