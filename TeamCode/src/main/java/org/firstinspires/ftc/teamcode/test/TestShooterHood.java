@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class TestShooterHood extends LinearOpMode {
     @Override
     public void runOpMode() {
+        double servo_position = 0f;
         DcMotor shooter = hardwareMap.get(DcMotor.class, "motor");
         Servo hood = hardwareMap.get(Servo.class, "servo");
 
@@ -16,18 +17,27 @@ public class TestShooterHood extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (gamepad1.right_trigger_pressed) {
-                shooter.setPower(1);
+                shooter.setPower(1f);
             } else {
-                shooter.setPower(0);
+                shooter.setPower(0f);
             }
 
-            if (gamepad1.dpad_up) {
-                hood.setPosition(hood.getPosition() + 0.05);
-            } else if (gamepad1.dpad_down) {
-                hood.setPosition(hood.getPosition() - 0.05);
-            } else {
-                hood.setPosition(hood.getPosition());
+            hood.setPosition(servo_position);
+            if (gamepad1.dpadUpWasPressed()) {
+                if (servo_position < 1.0) {
+                    servo_position += 0.05;
+                } else {
+                    servo_position = 1f;
+                }
+            } else if (gamepad1.dpadDownWasPressed()) {
+                if (servo_position > -1.0) {
+                    servo_position -= 0.05;
+                } else {
+                    servo_position = -1f;
+                }
             }
+            telemetry.addData("servo_position", servo_position);
+            telemetry.update();
         }
     }
 }
