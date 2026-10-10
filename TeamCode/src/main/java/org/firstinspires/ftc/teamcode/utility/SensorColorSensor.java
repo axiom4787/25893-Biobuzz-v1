@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.teamcode.test;
+package org.firstinspires.ftc.teamcode.utility;
 
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
-@TeleOp(name = "Sensor ColorSensor: Sensor ColorSensor")
+@Utility(name = "Sensor ColorSensor: Sensor ColorSensor")
 public class SensorColorSensor extends LinearOpMode {
     double maxRedOutput = 0;
     double maxGreenOutput = 0;
