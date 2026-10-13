@@ -15,12 +15,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Learning2 extends LinearOpMode {
     @Override
     public void runOpMode(){
-        DcMotor frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        DcMotor backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
-        DcMotor backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
-        backRightMotor.setDirection((DcMotorSimple.Direction.REVERSE));
+        DcMotor frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        DcMotor frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        DcMotor backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        DcMotor backRight = hardwareMap.get(DcMotor.class, "backRight");
+        backRight.setDirection((DcMotorSimple.Direction.REVERSE));
         CRServo leftIntake = hardwareMap.get(CRServo.class, "leftIntake");
         DcMotor middleIntake = hardwareMap.get(DcMotor.class, "middleIntake");
         CRServo rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
@@ -73,10 +73,10 @@ public class Learning2 extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            frontLeft.setPower(frontLeftPower);
+            backLeft.setPower(backLeftPower);
+            frontRight.setPower(frontRightPower);
+            backRight.setPower(backRightPower);
 
             if (gamepad1.options) {
                 imu.resetYaw();
