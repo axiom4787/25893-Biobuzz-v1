@@ -1,34 +1,31 @@
 package org.firstinspires.ftc.teamcode.utility;
 
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Utility(name = "Sensor ColorSensor: Sensor ColorSensor")
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+@Utility(name = "Test: Color sensor")
 public class SensorColorSensor extends LinearOpMode {
-    double maxRedOutput = 0;
-    double maxGreenOutput = 0;
     @Override
     public void runOpMode() {
         DcMotor shooter = hardwareMap.get(DcMotor.class, "motor");
-        ColorSensor sensorColorSensor = hardwareMap.get(ColorSensor.class, "color");
+        RevColorSensorV3 colorSensor = hardwareMap.get(RevColorSensorV3.class, "color");
+        TelemetryManager panels = PanelsTelemetry.INSTANCE.getTelemetry();
 
         waitForStart();
 
         while (opModeIsActive()) {
-            if (gamepad1.right_trigger_pressed) {
-                shooter.setPower(1);
-            } else {
-                shooter.setPower(0);
-            }
-            maxRedOutput = Math.max(maxRedOutput, sensorColorSensor.red());
-            maxGreenOutput = Math.max(maxGreenOutput, sensorColorSensor.green());
-            telemetry.addLine("Max values");
-            telemetry.addData("Red: ", maxRedOutput);
-            telemetry.addData("Green: ", maxGreenOutput);
-            telemetry.update();
+            panels.addData("red", colorSensor.red());
+            panels.addData("green", colorSensor.green());
+            panels.addData("blue", colorSensor.blue());
+            panels.addData("normalized colors", colorSensor.getNormalizedColors());
+            panels.addData("distance (inches)", colorSensor.getDistance(DistanceUnit.INCH));
+            panels.update(telemetry);
         }
     }
 }
