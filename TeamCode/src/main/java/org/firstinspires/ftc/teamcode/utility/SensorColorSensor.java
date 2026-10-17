@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.utility;
 
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
+//import com.bylazar.telemetry.PanelsTelemetry;
+//import com.bylazar.telemetry.TelemetryManager;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -13,19 +14,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class SensorColorSensor extends LinearOpMode {
     @Override
     public void runOpMode() {
-        DcMotor shooter = hardwareMap.get(DcMotor.class, "motor");
         RevColorSensorV3 colorSensor = hardwareMap.get(RevColorSensorV3.class, "color");
-        TelemetryManager panels = PanelsTelemetry.INSTANCE.getTelemetry();
+//        TelemetryManager panels = PanelsTelemetry.INSTANCE.getTelemetry();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
 
         while (opModeIsActive()) {
-            panels.addData("red", colorSensor.red());
-            panels.addData("green", colorSensor.green());
-            panels.addData("blue", colorSensor.blue());
-            panels.addData("normalized colors", colorSensor.getNormalizedColors());
-            panels.addData("distance (inches)", colorSensor.getDistance(DistanceUnit.INCH));
-            panels.update(telemetry);
+            
+
+            telemetry.addData("1: blue", colorSensor.blue());
+            telemetry.addData("3: green", colorSensor.green());
+            telemetry.addData("2: red", colorSensor.red());
+            telemetry.addData("1: normalized blue", colorSensor.getNormalizedColors().blue);
+            telemetry.addData("3: normalized green", colorSensor.getNormalizedColors().green);
+            telemetry.addData("2: normalized red", colorSensor.getNormalizedColors().red);
+//            telemetry.addData("distance (inches)", colorSensor.getDistance(DistanceUnit.INCH));
+            telemetry.update();
         }
     }
 }
