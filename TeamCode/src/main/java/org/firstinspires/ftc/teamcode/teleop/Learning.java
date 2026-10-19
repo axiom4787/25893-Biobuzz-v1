@@ -11,6 +11,11 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Prism.Color;
+import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
+import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
+
+import java.security.KeyStore;
 
 @TeleOp
 public class Learning extends LinearOpMode {
@@ -20,6 +25,14 @@ public class Learning extends LinearOpMode {
 //    double f = 12.1;
 
     int setpoint = 2000;
+
+    boolean colorUpdated = true;
+
+
+    PrismAnimations.Solid green = new PrismAnimations.Solid(Color.GREEN);
+    PrismAnimations.Solid red = new PrismAnimations.Solid(Color.RED);
+    PrismAnimations.Solid blue = new PrismAnimations.Solid(Color.BLUE);
+    PrismAnimations.Blink strobe = new PrismAnimations.Blink();
 
 //    int conf = 0; // p-0, i-1, d-2, f-3, setPoint-4
 //
@@ -42,6 +55,35 @@ public class Learning extends LinearOpMode {
         DcMotor frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         DcMotor backRight = hardwareMap.get(DcMotor.class, "backRight");
 
+        GoBildaPrismDriver prismDriver = hardwareMap.get(GoBildaPrismDriver.class, "prismDriver");
+
+        green.setBrightness(50);
+        green.setStartIndex(0);
+        green.setStopIndex(12);
+
+        blue.setBrightness(50);
+        blue.setStartIndex(0);
+        blue.setStopIndex(12);
+
+        red.setBrightness(50);
+        red.setStartIndex(0);
+        red.setStopIndex(12);
+
+        strobe.setBrightness(50);
+        strobe.setStartIndex(0);
+        strobe.setStopIndex(12);
+        strobe.setPrimaryColor(Color.RED);
+        strobe.setSecondaryColor(Color.WHITE);
+        strobe.setPeriod(500);
+
+
+        telemetry.addData("Device ID: ", prismDriver.getDeviceID());
+        telemetry.addData("Firmware Version: ", prismDriver.getFirmwareVersionString());
+        telemetry.addData("Hardware Version: ", prismDriver.getHardwareVersionString());
+        telemetry.addData("Power Cycle Count: ", prismDriver.getPowerCycleCount());
+        telemetry.update();
+
+
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -49,26 +91,46 @@ public class Learning extends LinearOpMode {
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
 
+        prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, red);
+
         waitForStart();
+
+        prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
 
         ElapsedTime timer = new ElapsedTime();
 
 
+
+
         while(opModeIsActive()){
 
+
+
             //for intake  (recalibrate to work right (if work wrong))
+            if(gamepad1.leftTriggerWasPressed()){
+                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, blue);
+                colorUpdated = true;
+            }
+
+
+
             if(gamepad1.left_trigger_pressed){
                 middleIntake.setPower(1);
                 leftIntake.setPower(1);
                 rightIntake.setPower(-1);
+
+
             }
-            else{
+            else {
                 middleIntake.setPower(0);
                 leftIntake.setPower(0);
                 rightIntake.setPower(0);
             }
-
             //for shooter
+            if(gamepad1.rightTriggerWasPressed()){
+                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, strobe);
+                colorUpdated = true;
+            }
             if(gamepad1.right_trigger_pressed) {
                 if(shooter.getVelocity() > setpoint){
                     shooter.setPower(0);
@@ -131,7 +193,10 @@ public class Learning extends LinearOpMode {
             telemetry.addData("vel ", shooter.getVelocity());
             telemetry.addData("yaw ", botYaw);
             telemetry.update();
-
+            if(!gamepad1.right_trigger_pressed && !gamepad1.left_trigger_pressed && colorUpdated){
+                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
+                colorUpdated = false;
+            }
         }
     }
 }

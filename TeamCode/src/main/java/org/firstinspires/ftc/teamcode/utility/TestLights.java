@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Utility;
 
 @Utility
 public class TestLights extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
 
     }
-//    GoBildaPrismDriver
 }
