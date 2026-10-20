@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
 
 import java.security.KeyStore;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class Learning extends LinearOpMode {
@@ -74,14 +75,7 @@ public class Learning extends LinearOpMode {
         strobe.setStopIndex(12);
         strobe.setPrimaryColor(Color.RED);
         strobe.setSecondaryColor(Color.WHITE);
-        strobe.setPeriod(500);
-
-
-        telemetry.addData("Device ID: ", prismDriver.getDeviceID());
-        telemetry.addData("Firmware Version: ", prismDriver.getFirmwareVersionString());
-        telemetry.addData("Hardware Version: ", prismDriver.getHardwareVersionString());
-        telemetry.addData("Power Cycle Count: ", prismDriver.getPowerCycleCount());
-        telemetry.update();
+        strobe.setPeriod(50, TimeUnit.MILLISECONDS);
 
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -146,17 +140,6 @@ public class Learning extends LinearOpMode {
                 transfer.setPower(0);
             }
 
-            //for transferer
-            /*
-            if(gamepad1.a){
-                transfer.setPower(-1);
-            } else if(gamepad1.x){
-                transfer.setPower(1);
-
-            } else{
-                transfer.setPower(0);
-            }
-            */
             //wheel calibration
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
