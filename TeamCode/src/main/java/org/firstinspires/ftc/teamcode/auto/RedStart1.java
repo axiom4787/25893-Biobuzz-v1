@@ -11,10 +11,14 @@ import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.*;
+import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
@@ -42,18 +46,63 @@ public class RedStart1 extends LinearOpMode {
     private final Pose point5Control1 = poseFactory.of(42.9794, 42.9024, 0);
     private final Pose point5Control2 = poseFactory.of(10.8392, 108.7302, 0);
 
+
+    DcMotorEx shooter;
+    DcMotor middleIntake;
+    CRServo leftIntake;
+    CRServo rightIntake;
+    CRServo transfer;
+
+    int setpoint = 2000;
+
     // Autonomous routine
     public Command autoRoutine() {
-        return sequential(
+        return parallel(
+                infinite(() -> {
+                            if (shooter.getVelocity() > setpoint) {
+                                shooter.setPower(0);
+                            } else if (shooter.getVelocity() == setpoint) {
+                                shooter.setPower(setpoint / 2000);
+                            } else {
+                                shooter.setPower(1);
+                            }
+                        }),
+
+                sequential(
+                //shooter here
                 follow(follower, path1()),
-                waitMs(2000),
+                instant(() -> transfer.setPower(-1)),
+                waitMs(2500),
+                instant(() -> transfer.setPower(0)),
+
                 follow(follower, path2()),
+                instant(() -> leftIntake.setPower(1)),
+                instant(() -> middleIntake.setPower(1)),
+                instant(() -> rightIntake.setPower(-1)),
                 waitMs(3000),
+                instant(() -> leftIntake.setPower(0)),
+                instant(() -> middleIntake.setPower(0)),
+                instant(() -> rightIntake.setPower(0)),
+
                 follow(follower, path3()),
-                waitMs(2000),
+                instant(() -> transfer.setPower(-1)),
+                waitMs(2500),
+                instant(() -> transfer.setPower(0)),
+
                 follow(follower, path4()),
+                instant(() -> leftIntake.setPower(1)),
+                instant(() -> middleIntake.setPower(1)),
+                instant(() -> rightIntake.setPower(-1)),
                 waitMs(3000),
-                follow(follower, path5())
+                instant(() -> leftIntake.setPower(0)),
+                instant(() -> middleIntake.setPower(0)),
+                instant(() -> rightIntake.setPower(0)),
+
+                follow(follower, path5()),
+                instant(() -> transfer.setPower(-1)),
+                waitMs(2500),
+                instant(() -> transfer.setPower(0))
+                )
         );
     }
 
@@ -63,6 +112,12 @@ public class RedStart1 extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(redStart);
         follower.update();
+
+        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        middleIntake = hardwareMap.get(DcMotor.class, "middleIntake");
+        leftIntake = hardwareMap.get(CRServo.class, "leftIntake");
+        rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
+        transfer = hardwareMap.get(CRServo.class, "transfer");
 
         waitForStart();
         schedule(autoRoutine());

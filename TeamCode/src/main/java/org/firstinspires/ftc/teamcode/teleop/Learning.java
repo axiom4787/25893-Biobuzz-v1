@@ -44,8 +44,6 @@ public class Learning extends LinearOpMode {
     public void runOpMode() {
         //bunch of random hardware mapping stuff
         DcMotorEx shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(p, i, d, f));
-
         DcMotor middleIntake = hardwareMap.get(DcMotor.class, "middleIntake");
         CRServo leftIntake = hardwareMap.get(CRServo.class, "leftIntake");
         CRServo rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
