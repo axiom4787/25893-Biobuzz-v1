@@ -20,20 +20,21 @@ import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class Learning extends LinearOpMode {
-//    double p = 20.0;
-//    double i = 0.0;
-//    double d = 0.0;
-//    double f = 12.1;
 
     int setpoint = 2000;
 
     boolean colorUpdated = true;
 
+    int goalX = 70;
+    int goalY = 70;
+
 
     PrismAnimations.Solid green = new PrismAnimations.Solid(Color.GREEN);
     PrismAnimations.Solid red = new PrismAnimations.Solid(Color.RED);
     PrismAnimations.Solid blue = new PrismAnimations.Solid(Color.BLUE);
-    PrismAnimations.Blink strobe = new PrismAnimations.Blink();
+    PrismAnimations.Solid white = new PrismAnimations.Solid(Color.WHITE);
+    PrismAnimations.Blink strobe1 = new PrismAnimations.Blink();
+    PrismAnimations.Blink strobe2 = new PrismAnimations.Blink();
 
 //    int conf = 0; // p-0, i-1, d-2, f-3, setPoint-4
 //
@@ -68,12 +69,25 @@ public class Learning extends LinearOpMode {
         red.setStartIndex(0);
         red.setStopIndex(12);
 
-        strobe.setBrightness(50);
-        strobe.setStartIndex(0);
-        strobe.setStopIndex(12);
-        strobe.setPrimaryColor(Color.RED);
-        strobe.setSecondaryColor(Color.WHITE);
-        strobe.setPeriod(50, TimeUnit.MILLISECONDS);
+        white.setBrightness(50);
+        white.setStartIndex(0);
+        white.setStopIndex(12);
+
+        strobe1.setBrightness(50);
+        strobe1.setStartIndex(0);
+        strobe1.setStopIndex(5);
+        strobe1.setPrimaryColor(Color.RED);
+        strobe1.setSecondaryColor(Color.WHITE);
+        strobe1.setPeriod(500, TimeUnit.MILLISECONDS);
+        strobe1.setPrimaryColorPeriod(250, TimeUnit.MILLISECONDS);
+
+        strobe2.setBrightness(50);
+        strobe2.setStartIndex(6);
+        strobe2.setStopIndex(11);
+        strobe2.setPrimaryColor(Color.WHITE);
+        strobe2.setSecondaryColor(Color.RED);
+        strobe2.setPeriod(500, TimeUnit.MILLISECONDS);
+        strobe2.setPrimaryColorPeriod(250, TimeUnit.MILLISECONDS);
 
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -120,7 +134,8 @@ public class Learning extends LinearOpMode {
             }
             //for shooter
             if(gamepad1.rightTriggerWasPressed()){
-                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, strobe);
+                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, strobe1);
+                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_1, strobe2);
                 colorUpdated = true;
             }
             if(gamepad1.right_trigger_pressed) {
@@ -137,6 +152,10 @@ public class Learning extends LinearOpMode {
                 shooter.setPower(0);
                 transfer.setPower(0);
             }
+
+
+            //attempt at making autoalign for shooter
+
 
             //wheel calibration
             double y = -gamepad1.left_stick_y;
@@ -175,6 +194,7 @@ public class Learning extends LinearOpMode {
             telemetry.addData("yaw ", botYaw);
             telemetry.update();
             if(!gamepad1.right_trigger_pressed && !gamepad1.left_trigger_pressed && colorUpdated){
+                prismDriver.clearAllAnimations();
                 prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
                 colorUpdated = false;
             }
