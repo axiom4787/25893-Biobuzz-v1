@@ -1,27 +1,33 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.pedropathing.controllers.Controller;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
+import com.pedropathing.math.Pose;
+import com.pedropathing.utils.Angle;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Prism.Color;
 import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-import java.security.KeyStore;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class Learning extends LinearOpMode {
 
     int setpoint = 2000;
+    boolean current = true;
+    boolean changePID = true;
+
+    double p = 1;
+    double d = 0;
 
     boolean colorUpdated = true;
 
@@ -50,10 +56,8 @@ public class Learning extends LinearOpMode {
         CRServo rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
         CRServo transfer = hardwareMap.get(CRServo.class, "transfer");
 
-        DcMotor frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        DcMotor backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        DcMotor frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        DcMotor backRight = hardwareMap.get(DcMotor.class, "backRight");
+        Follower follower = Constants.create(hardwareMap);
+        follower.setPose(new Pose(85, 8, Math.PI/2));
 
         GoBildaPrismDriver prismDriver = hardwareMap.get(GoBildaPrismDriver.class, "prismDriver");
 
@@ -89,13 +93,7 @@ public class Learning extends LinearOpMode {
         strobe2.setPeriod(500, TimeUnit.MILLISECONDS);
         strobe2.setPrimaryColorPeriod(250, TimeUnit.MILLISECONDS);
 
-
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        IMU imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-        imu.initialize(parameters);
+        Controller controller = Controller.pid(p, 0, d);
 
         prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, red);
 
@@ -109,7 +107,7 @@ public class Learning extends LinearOpMode {
 
 
         while(opModeIsActive()){
-
+            follower.update();
 
 
             //for intake  (recalibrate to work right (if work wrong))
@@ -139,16 +137,25 @@ public class Learning extends LinearOpMode {
                 colorUpdated = true;
             }
             if(gamepad1.right_trigger_pressed) {
+                Pose goalPose = new Pose(58, 84);
+                double dx = follower.pose().x() - goalPose.x();
+                double dy = follower.pose().y() - goalPose.y();
+                double goalAngle = Math.atan2(dy, dx);
+                double robotAngle = follower.pose().heading();
+                double error = Angle.normalizeSigned(goalAngle - robotAngle);
+                double out = controller.calculate(goalAngle, error);
+                follower.manual(ManualDrive.fieldCentric(-gamepad1.left_stick_y, -gamepad1.left_stick_x, out, follower.pose().heading()));
                 if(shooter.getVelocity() > setpoint){
                     shooter.setPower(0);
                     transfer.setPower(-1);
                 } else if (shooter.getVelocity() == setpoint) {
-                    shooter.setPower(setpoint/2000);
+                    shooter.setPower(setpoint/2000.0);
                 } else {
                     shooter.setPower(1);
                 }
             }
             else{
+                follower.manual(ManualDrive.fieldCentric(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, follower.pose().heading()));
                 shooter.setPower(0);
                 transfer.setPower(0);
             }
@@ -156,43 +163,46 @@ public class Learning extends LinearOpMode {
 
             //attempt at making autoalign for shooter
 
-
-            //wheel calibration
-            double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x;
-            double rx = -gamepad1.right_stick_x;
-            double botYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            double rotX = x * Math.cos(-botYaw) - y * Math.sin(-botYaw);
-            double rotY = x * Math.sin(-botYaw) + y * Math.cos(-botYaw);
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = (rotY + rotX + rx) / denominator;
-            double backLeftPower = (rotY - rotX +rx) / denominator;
-            double frontRightPower = (rotY - rotX - rx) / denominator;
-            double backRightPower = (rotY + rotX - rx) / denominator;
-            if(gamepad1.options){
-                imu.resetYaw();
-            }
-
-            //wheel speed assignment
-            frontLeft.setPower(frontLeftPower);
-            backLeft.setPower(backLeftPower);
-            frontRight.setPower(frontRightPower);
-            backRight.setPower(backRightPower);
-
-
-            //configuring PIDF
-            if (gamepad1.dpadUpWasPressed())
-            {
-                setpoint += 100;
-            }
-            else if (gamepad1.dpadDownWasPressed()) {
-                setpoint -= 100;
-            }
-
-            telemetry.addData("setpoint ", setpoint);
-            telemetry.addData("vel ", shooter.getVelocity());
-            telemetry.addData("yaw ", botYaw);
+//            if (gamepad1.dpadRightWasPressed()){
+//                if (current){
+//                    current = false;
+//                }
+//                else {
+//                    current = true;
+//                }
+//            }
+//
+//            //configuring PID
+//            if (current) {
+//                if (gamepad1.dpadUpWasPressed()) {
+//                    p += 0.01;
+//                    changePID = false;
+//                } else if (gamepad1.dpadDownWasPressed()) {
+//                    p -= 0.01;
+//                    changePID = false;
+//                }
+//            }
+//            else{
+//                if (gamepad1.dpadUpWasPressed()) {
+//                    d += 0.001;
+//                    changePID = false;
+//                } else if (gamepad1.dpadDownWasPressed()) {
+//                    d -= 0.001;
+//                    changePID = false;
+//                }
+//            }
+//            if (!changePID){
+//                controller = Controller.pid(p, 0, d);
+//            }
+//
+//            telemetry.addData("d ", d);
+//            telemetry.addData("p ", p);
+//            telemetry.addData("current (p=true)", current);
+            telemetry.addData("robot pos ", follower.pose());
             telemetry.update();
+
+
+
             if(!gamepad1.right_trigger_pressed && !gamepad1.left_trigger_pressed && colorUpdated){
                 prismDriver.clearAllAnimations();
                 prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
