@@ -12,12 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Prism.Color;
-import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
-import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.PrismDriver;
 
-import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class Learning extends LinearOpMode {
@@ -35,13 +32,6 @@ public class Learning extends LinearOpMode {
     int goalY = 70;
 
 
-    PrismAnimations.Solid green = new PrismAnimations.Solid(Color.GREEN);
-    PrismAnimations.Solid red = new PrismAnimations.Solid(Color.RED);
-    PrismAnimations.Solid blue = new PrismAnimations.Solid(Color.BLUE);
-    PrismAnimations.Solid white = new PrismAnimations.Solid(Color.WHITE);
-    PrismAnimations.Blink strobe1 = new PrismAnimations.Blink();
-    PrismAnimations.Blink strobe2 = new PrismAnimations.Blink();
-
 //    int conf = 0; // p-0, i-1, d-2, f-3, setPoint-4
 //
 //
@@ -56,50 +46,18 @@ public class Learning extends LinearOpMode {
         CRServo rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
         CRServo transfer = hardwareMap.get(CRServo.class, "transfer");
 
+        PrismDriver prismDriver = new PrismDriver(hardwareMap);
+
         Follower follower = Constants.create(hardwareMap);
         follower.setPose(new Pose(85, 8, Math.PI/2));
 
-        GoBildaPrismDriver prismDriver = hardwareMap.get(GoBildaPrismDriver.class, "prismDriver");
-
-        green.setBrightness(50);
-        green.setStartIndex(0);
-        green.setStopIndex(12);
-
-        blue.setBrightness(50);
-        blue.setStartIndex(0);
-        blue.setStopIndex(12);
-
-        red.setBrightness(50);
-        red.setStartIndex(0);
-        red.setStopIndex(12);
-
-        white.setBrightness(50);
-        white.setStartIndex(0);
-        white.setStopIndex(12);
-
-        strobe1.setBrightness(50);
-        strobe1.setStartIndex(0);
-        strobe1.setStopIndex(5);
-        strobe1.setPrimaryColor(Color.RED);
-        strobe1.setSecondaryColor(Color.WHITE);
-        strobe1.setPeriod(500, TimeUnit.MILLISECONDS);
-        strobe1.setPrimaryColorPeriod(250, TimeUnit.MILLISECONDS);
-
-        strobe2.setBrightness(50);
-        strobe2.setStartIndex(6);
-        strobe2.setStopIndex(11);
-        strobe2.setPrimaryColor(Color.WHITE);
-        strobe2.setSecondaryColor(Color.RED);
-        strobe2.setPeriod(500, TimeUnit.MILLISECONDS);
-        strobe2.setPrimaryColorPeriod(250, TimeUnit.MILLISECONDS);
-
         Controller controller = Controller.pid(p, 0, d);
 
-        prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, red);
+        prismDriver.setRed();
 
         waitForStart();
 
-        prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
+        prismDriver.setGreen();
 
         ElapsedTime timer = new ElapsedTime();
 
@@ -112,7 +70,7 @@ public class Learning extends LinearOpMode {
 
             //for intake  (recalibrate to work right (if work wrong))
             if(gamepad1.leftTriggerWasPressed()){
-                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, blue);
+                prismDriver.setBlue();
                 colorUpdated = true;
             }
 
@@ -132,8 +90,7 @@ public class Learning extends LinearOpMode {
             }
             //for shooter
             if(gamepad1.rightTriggerWasPressed()){
-                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, strobe1);
-                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_1, strobe2);
+                prismDriver.setStrobe();
                 colorUpdated = true;
             }
             if(gamepad1.right_trigger_pressed) {
@@ -204,8 +161,7 @@ public class Learning extends LinearOpMode {
 
 
             if(!gamepad1.right_trigger_pressed && !gamepad1.left_trigger_pressed && colorUpdated){
-                prismDriver.clearAllAnimations();
-                prismDriver.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, green);
+                prismDriver.setGreen();
                 colorUpdated = false;
             }
         }

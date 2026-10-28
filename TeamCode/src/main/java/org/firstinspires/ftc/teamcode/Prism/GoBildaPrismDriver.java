@@ -50,6 +50,7 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
     private final int MAXIMUM_NUMBER_OF_ANIMATION_GROUPS = 8;
     private PrismAnimations.AnimationBase[] animations = new PrismAnimations.AnimationBase[MAXIMUM_NUMBER_OF_ANIMATIONS];
 
+
     //#region Public Types
     public enum LayerHeight
     {
