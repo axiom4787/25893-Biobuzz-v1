@@ -16,11 +16,12 @@ import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+
 
 import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 @Autonomous(name = "RedStart1", group = "Autonomous")
 public class RedStart1 extends LinearOpMode {
@@ -30,10 +31,12 @@ public class RedStart1 extends LinearOpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose redStart = poseFactory.of(58, 8, 90);
-    private final Pose path1 = poseFactory.of(58, 32, 270);
-    private final Pose point2Start = poseFactory.of(58, 32, 270);
+    private final Pose path1 = poseFactory.of(58, 8, 270);
+    private final Pose path1Control1 = poseFactory.of(37.75, 22.75, 0);
+    private final Pose path1Control2 = poseFactory.of(76.75, 22.75, 0);
+    private final Pose point2Start = poseFactory.of(58, 8, 270);
     private final Pose point2 = poseFactory.of(46.9405, 130.2073, 90);
-    private final Pose point2Control1 = poseFactory.of(65.4258, 120.8933, 0);
+    private final Pose point2Control1 = poseFactory.of(76.75, 121.75, 0);
     private final Pose point2Control2 = poseFactory.of(47.0556, 115.9627, 0);
     private final Pose point3 = poseFactory.of(58, 109.5, 90);
     private final Pose point3Control1 = poseFactory.of(47, 116.1006, 0);
@@ -47,77 +50,68 @@ public class RedStart1 extends LinearOpMode {
     private final Pose point5Control2 = poseFactory.of(10.8392, 108.7302, 0);
 
 
-    DcMotorEx shooter;
-    DcMotor middleIntake;
-    CRServo leftIntake;
-    CRServo rightIntake;
-    CRServo transfer;
+    private Transfer transfer;
 
-    int setpoint = 2000;
+    private Shooter shooter;
+
+    private Intake intake;
+
+    private int setpoint;
 
     // Autonomous routine
     public Command autoRoutine() {
         return parallel(
                 infinite(() -> {
-                            if (shooter.getVelocity() > setpoint) {
-                                shooter.setPower(0);
-                            } else if (shooter.getVelocity() == setpoint) {
-                                shooter.setPower(setpoint / 2000);
-                            } else {
-                                shooter.setPower(1);
-                            }
+                            shooter.setVelocity(setpoint);
+                            shooter.update();
                         }),
 
                 sequential(
-                //shooter here
                 follow(follower, path1()),
-                instant(() -> transfer.setPower(-1)),
+
+                instant(() -> transfer.in()),
                 waitMs(2500),
-                instant(() -> transfer.setPower(0)),
+                instant(() -> transfer.off()),
 
                 follow(follower, path2()),
-                instant(() -> leftIntake.setPower(1)),
-                instant(() -> middleIntake.setPower(1)),
-                instant(() -> rightIntake.setPower(-1)),
+
+                instant(() -> intake.in()),
                 waitMs(3000),
-                instant(() -> leftIntake.setPower(0)),
-                instant(() -> middleIntake.setPower(0)),
-                instant(() -> rightIntake.setPower(0)),
+                instant(() -> intake.off()),
 
                 follow(follower, path3()),
-                instant(() -> transfer.setPower(-1)),
+
+                instant(() -> transfer.in()),
                 waitMs(2500),
-                instant(() -> transfer.setPower(0)),
+                instant(() -> transfer.off()),
 
                 follow(follower, path4()),
-                instant(() -> leftIntake.setPower(1)),
-                instant(() -> middleIntake.setPower(1)),
-                instant(() -> rightIntake.setPower(-1)),
+
+                instant(() -> intake.in()),
                 waitMs(3000),
-                instant(() -> leftIntake.setPower(0)),
-                instant(() -> middleIntake.setPower(0)),
-                instant(() -> rightIntake.setPower(0)),
+                instant(() -> intake.off()),
 
                 follow(follower, path5()),
-                instant(() -> transfer.setPower(-1)),
+
+                instant(() -> transfer.in()),
                 waitMs(2500),
-                instant(() -> transfer.setPower(0))
+                instant(() -> transfer.off())
                 )
         );
     }
 
     @Override
     public void runOpMode() {
+        setpoint = 2100;
+        Transfer transfer = new Transfer(hardwareMap);
+        Shooter shooter = new Shooter(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
+
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(redStart);
         follower.update();
 
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        middleIntake = hardwareMap.get(DcMotor.class, "middleIntake");
-        leftIntake = hardwareMap.get(CRServo.class, "leftIntake");
-        rightIntake = hardwareMap.get(CRServo.class, "rightIntake");
-        transfer = hardwareMap.get(CRServo.class, "transfer");
 
         waitForStart();
         schedule(autoRoutine());
@@ -140,7 +134,7 @@ public class RedStart1 extends LinearOpMode {
     }
 
     public Path path1() {
-        return Paths.line(redStart, path1).linear(redStart, path1);
+        return Paths.curve(redStart, path1Control1, path1Control2, path1).linear(redStart, path1);
     }
 
     public Path path2() {
