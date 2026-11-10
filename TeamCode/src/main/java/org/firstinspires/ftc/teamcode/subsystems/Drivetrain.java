@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 
+import com.pedropathing.controllers.Controller;
 import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
@@ -33,14 +34,20 @@ public class Drivetrain {
     }
 
 
+    public double power = 0;
+    private final Controller headingPID = Controller.proportional(2);
     /// Drive the robot in field centric mode while continually facing the hive
     public void driveFacingGoalFC(double forward, double right) {
         DrivePowers powers = ManualDrive.fieldCentric(forward, right, 0, follower.pose().heading());
 
         double targetHeading = getTargetHeading();
-        // Add pi because the shooter is on the back of the robot
 
-        ManualDrive.headingLock(follower, Constants.foresightConfig.headingFeedback.get(), powers, targetHeading);
+        double headingError = Angle.normalizeSigned(targetHeading - follower.pose().heading());
+        double power = headingPID.calculate(targetHeading, headingError, follower.twist().omega);
+        this.power = power;
+        powers = new DrivePowers(powers.forward(), powers.strafe(), power);
+
+        follower.manual(powers);
     }
 
 
@@ -66,13 +73,19 @@ public class Drivetrain {
     }
 
 
+    /// Set the robot's pose
+    public void setPose(double x, double y, double headingDegrees) {
+        follower.setPose(new Pose(x, y, Math.toRadians(headingDegrees)));
+    }
+
+
     /// Helper to get the robot's target heading for automatically aligning to the goal
-    private double getTargetHeading() {
+    public double getTargetHeading() {
         double dx = follower.pose().x() - getHivePose().x();
         double dy = follower.pose().y() - getHivePose().y();
 
         // Add pi because the shooter is on the back of the robot, and 0 is the front of the robot
-        return Angle.normalize(Math.atan2(dy, dx) + Math.PI);
+        return Angle.normalize(Math.atan2(dy, dx));
     }
 
 

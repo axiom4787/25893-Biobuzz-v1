@@ -24,6 +24,12 @@ public class Shooter {
     }
 
 
+    /// Get the shooter's velocity in ticks per second
+    public double getVelocity() {
+        return shooter.getVelocity();
+    }
+
+
     /// Set the shooter's target velocity
     public void setTargetVelocity(int tps){
         this.tps = tps;

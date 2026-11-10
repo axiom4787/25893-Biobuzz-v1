@@ -19,6 +19,10 @@ public class Teleop extends LinearOpMode {
         PrismDriver prismDriver = new PrismDriver(hardwareMap);
         Drivetrain drivetrain = new Drivetrain(hardwareMap);
 
+        // Note: If you don't set the follower's position at the beginning of teleop,
+        // it will use the pinpoint to start with the same pose as at auto end
+        drivetrain.setPose(8, 141.5-8, 0);
+
         prismDriver.setRed();
 
         waitForStart();
@@ -53,6 +57,15 @@ public class Teleop extends LinearOpMode {
             // Update subsystems
             drivetrain.update();
             shooter.update();
+
+            telemetry.addData("Drivetrain", "x=%4.2f y=%4.2f, h=%5.2f", drivetrain.follower().pose().x(), drivetrain.follower().pose().y(), Math.toDegrees(drivetrain.follower().pose().heading()));
+            telemetry.addData("Drivetrain - driving mode", gamepad1.right_trigger_pressed ? "Facing goal" : "Normal");
+            telemetry.addData("Drivetrain - Target heading", Math.toDegrees(drivetrain.getTargetHeading()));
+            telemetry.addData("Drivetrain - heading power", drivetrain.power);
+            telemetry.addData("Shooter - Velocity", shooter.getVelocity());
+            telemetry.addData("Shooter - Is up to speed", shooter.isUpToSpeed());
+            telemetry.addData("Transfer - is running", gamepad1.right_trigger_pressed && shooter.isUpToSpeed() && drivetrain.isAlignedToHive());
+            telemetry.update();
         }
     }
 }
