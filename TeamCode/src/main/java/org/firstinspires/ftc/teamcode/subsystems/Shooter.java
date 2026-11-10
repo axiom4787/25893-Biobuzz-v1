@@ -4,27 +4,34 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter {
-    public DcMotorEx shooter;
-    public int tps;
+    private final DcMotorEx shooter;
+    private int tps = 0;
+
     public Shooter(HardwareMap hardwareMap){
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
     }
+
+
+    /// Method to update the shooter. Must be called on every loop
     public void update(){
-        if(shooter.getVelocity() > tps){
+        if(shooter.getVelocity() > tps) {
             shooter.setPower(0);
         } else if (shooter.getVelocity() == tps) {
-            shooter.setPower(tps/2000.0);
+            shooter.setPower(tps / 2000.0);
         } else {
             shooter.setPower(1);
         }
-
     }
-    public void setVelocity(int tps){
+
+
+    /// Set the shooter's target velocity
+    public void setTargetVelocity(int tps){
         this.tps = tps;
     }
 
-    public boolean upToSpeed(){
-        return shooter.getVelocity() >= tps - 200;
 
+    /// Whether the shooter is up to speed (within 60 TPS)
+    public boolean isUpToSpeed(){
+        return shooter.getVelocity() >= tps - 60;
     }
 }

@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import static com.pedropathing.api.Paths.*;
+
 import com.pedropathing.api.Paths;
 
 import com.pedropathing.api.PoseFactory;
@@ -9,11 +9,13 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
+
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.*;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -22,6 +24,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+
 
 @Autonomous(name = "RedStart1", group = "Autonomous")
 public class RedStart1 extends LinearOpMode {
@@ -62,40 +65,40 @@ public class RedStart1 extends LinearOpMode {
     public Command autoRoutine() {
         return parallel(
                 infinite(() -> {
-                            shooter.setVelocity(setpoint);
-                            shooter.update();
-                        }),
+                    shooter.setTargetVelocity(setpoint);
+                    shooter.update();
+                }),
 
                 sequential(
-                follow(follower, path1()),
+                        follow(follower, path1()),
 
-                instant(() -> transfer.in()),
-                waitMs(2500),
-                instant(() -> transfer.off()),
+                        instant(() -> transfer.in()),
+                        waitMs(2500),
+                        instant(() -> transfer.off()),
 
-                follow(follower, path2()),
+                        follow(follower, path2()),
 
-                instant(() -> intake.in()),
-                waitMs(3000),
-                instant(() -> intake.off()),
+                        instant(() -> intake.in()),
+                        waitMs(3000),
+                        instant(() -> intake.off()),
 
-                follow(follower, path3()),
+                        follow(follower, path3()),
 
-                instant(() -> transfer.in()),
-                waitMs(2500),
-                instant(() -> transfer.off()),
+                        instant(() -> transfer.in()),
+                        waitMs(2500),
+                        instant(() -> transfer.off()),
 
-                follow(follower, path4()),
+                        follow(follower, path4()),
 
-                instant(() -> intake.in()),
-                waitMs(3000),
-                instant(() -> intake.off()),
+                        instant(() -> intake.in()),
+                        waitMs(3000),
+                        instant(() -> intake.off()),
 
-                follow(follower, path5()),
+                        follow(follower, path5()),
 
-                instant(() -> transfer.in()),
-                waitMs(2500),
-                instant(() -> transfer.off())
+                        instant(() -> transfer.in()),
+                        waitMs(2500),
+                        instant(() -> transfer.off())
                 )
         );
     }

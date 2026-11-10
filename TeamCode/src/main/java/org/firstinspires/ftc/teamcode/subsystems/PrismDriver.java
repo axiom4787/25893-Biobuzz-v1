@@ -10,7 +10,8 @@ import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
 import java.util.concurrent.TimeUnit;
 
 public class PrismDriver {
-    public GoBildaPrismDriver prismDriver;
+    private final GoBildaPrismDriver prismDriver;
+
     public PrismDriver(HardwareMap hardwareMap){
         prismDriver = hardwareMap.get(GoBildaPrismDriver.class, "prismDriver");
     }

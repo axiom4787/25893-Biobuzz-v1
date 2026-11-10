@@ -5,6 +5,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.utils.Angle;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.PrismDriver;
 
 
 @TeleOp
+@Disabled
 public class Learning extends LinearOpMode {
 
     int setpoint = 2000;
