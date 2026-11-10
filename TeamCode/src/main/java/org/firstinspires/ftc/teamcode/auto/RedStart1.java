@@ -73,7 +73,7 @@ public class RedStart1 extends LinearOpMode {
                         follow(follower, path1()),
 
                         instant(() -> transfer.in()),
-                        waitMs(2500),
+                        waitMs(3500),
                         instant(() -> transfer.off()),
 
                         follow(follower, path2()),
@@ -106,9 +106,9 @@ public class RedStart1 extends LinearOpMode {
     @Override
     public void runOpMode() {
         setpoint = 2100;
-        Transfer transfer = new Transfer(hardwareMap);
-        Shooter shooter = new Shooter(hardwareMap);
-        Intake intake = new Intake(hardwareMap);
+        transfer = new Transfer(hardwareMap);
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
 
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
