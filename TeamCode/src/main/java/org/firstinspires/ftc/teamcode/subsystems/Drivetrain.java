@@ -81,11 +81,11 @@ public class Drivetrain {
 
     /// Helper to get the robot's target heading for automatically aligning to the goal
     public double getTargetHeading() {
-        double dx = follower.pose().x() - getHivePose().x();
-        double dy = follower.pose().y() - getHivePose().y();
+        double dx = getHivePose().x() - follower.pose().x();
+        double dy = getHivePose().y() - follower.pose().y();
 
         // Add pi because the shooter is on the back of the robot, and 0 is the front of the robot
-        return Angle.normalize(Math.atan2(dy, dx));
+        return Angle.normalize(Math.atan2(dy, dx) + Math.PI);
     }
 
 
